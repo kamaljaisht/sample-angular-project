@@ -1,0 +1,62 @@
+<div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {{ isEditMode ? 'Edit Task' : 'Add Task' }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <form [formGroup]="taskForm" (ngSubmit)="submitTask()">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            User Id
+                            <span class="star">*</span>
+                            @if(taskForm.controls['userId'].touched && taskForm.controls['userId'].invalid) {
+                            <span class="invalid">
+                                ( Please fill out this field )
+                            </span>
+                            }
+                        </label>
+                        <input type="number" class="form-control" formControlName="userId" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Task Title
+                            <span class="star">*</span>
+                            @if(taskForm.controls['todo'].touched && taskForm.controls['todo'].invalid) {
+                            <span class="invalid">
+                                ( Please fill out this field )
+                            </span>
+                            }
+                        </label>
+                        <input type="text" class="form-control" formControlName="todo" />
+                    </div>
+                    <div class="form-check ml-3">
+                        <input type="checkbox" class="form-check-input" formControlName="completed" />
+                        <label class="form-check-label">
+                            Completed
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="loading">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="loading">
+                        @if(loading) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        Save
+                    </button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</div>

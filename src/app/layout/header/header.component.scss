@@ -1,0 +1,17 @@
+:host {
+    .left-margin {
+        @media(min-width: 580px) {
+            left: -200px;
+        }
+
+        left: 0px;
+    }
+
+       .left-margin-notify {
+        @media(min-width: 580px) {
+            left: -150px;
+        }
+
+        left: 0px;
+    }
+}

@@ -1,0 +1,60 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center p-3 gradient-bg m-0">
+  <div class="login-wrapper">
+    <div class="text-center mb-4">
+      <div class="logo-icon">
+        <span>Company Logo</span>
+      </div>
+      <h1 class="text-white fw-bold fs-3 mb-1">Welcome back</h1>
+      <p class="text-secondary small m-0">Sign in to your account to continue</p>
+    </div>
+    <div class="card-glass" [formGroup]="loginForm">
+      <div class="mb-3">
+        <label class="field-label">Username</label>
+        <div class="input-wrap">
+          <i class="bi bi-envelope input-icon"></i>
+          <input type="text" class="form-field" formControlName="username" placeholder="Enter your username" />
+        </div>
+           @if(loginForm.controls['username'].touched && loginForm.controls['username'].invalid) {
+        <div class="invalid">
+          Username is required
+        </div>
+        }
+      </div>
+      <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="field-label" style="margin:0;">Password</label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+        <div class="input-wrap">
+          <i class="bi bi-lock input-icon"></i>
+          <input [type]="displayPassword ? 'text' : 'password'" class="form-field has-toggle" formControlName="password"
+            placeholder="Enter your password" />
+          <button type="button" class="input-toggle" (click)="togglePassword()">
+            <i class="bi" [class.bi-eye]="!displayPassword" [class.bi-eye-slash]="displayPassword"
+              style="font-size:0.9rem;"></i>
+          </button>
+        </div>
+          @if(loginForm.controls['password'].touched && loginForm.controls['password'].invalid) {
+        <div class="invalid">
+          Password is required
+        </div>
+        }
+      </div>
+
+      <button class="btn btn-signin" (click)="login()" [disabled]="loading">
+        @if(loading) {
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        Sign in
+      </button>
+      <p class="text-center mt-4 mb-0 signup-text">
+        Don't have an account?
+        <a href="#" class="signup-link">Create one for free</a>
+      </p>
+    </div>
+    <p class="text-center mt-4 footer-text">
+      By continuing, you agree to our
+      <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+    </p>
+  </div>
+</div>

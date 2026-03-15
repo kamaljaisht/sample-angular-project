@@ -1,0 +1,22 @@
+<div class="row mt-3">
+    <div class="col-xl-12 col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Tasks Info</h6>
+                <button class="btn btn-primary btn-sm" (click)="openAddTask()">
+                    Add Task
+                </button>
+            </div>
+            <div class="card-body">
+                    <app-data-table [data]="taskInfo" [columns]="columns" (cellClicked)="onCellClicked($event)">
+                    </app-data-table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<app-add-task
+  [task]="selectedTask"
+  (saved)="handleSaved($event)">
+</app-add-task>
