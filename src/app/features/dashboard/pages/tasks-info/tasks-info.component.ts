@@ -102,18 +102,31 @@ export class TasksInfoComponent {
   }
 
   handleSaved(data: Task) {
-    const index = this.taskInfo.findIndex(
-      t => t.id === data.id
-    );
-    if (index > -1) {
-      this.taskInfo[index] = data;
-      this.taskInfo = [...this.taskInfo];
-    } else {
+    // const index = this.taskInfo.findIndex(
+    //   t => t.id === data.id
+    // );
+    // if (index > -1) {
+    //   this.taskInfo[index] = data;
+    //   this.taskInfo = [...this.taskInfo];
+    // } else {
+      const exists = this.taskInfo.some(t => t.id === data.id);
+      if (exists) {
+        const maxId = Math.max(...this.taskInfo.map(t => t.id));
+        data.id = maxId + 1;
+      }
       this.taskInfo = [
         data,
         ...this.taskInfo
       ];
-    }
+    // }
+  }
+
+  handleUpdate = (data: Task) => {
+    const index = this.taskInfo.findIndex(
+      t => t.id === data.id
+    );
+    this.taskInfo[index] = data;
+    this.taskInfo = [...this.taskInfo];
   }
 
 }

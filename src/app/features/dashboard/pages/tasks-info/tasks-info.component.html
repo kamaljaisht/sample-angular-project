@@ -19,5 +19,6 @@
 <app-add-task
   [task]="selectedTask"
   [totalTasks]="totalTasks"
-  (saved)="handleSaved($event)">
+  (saved)="handleSaved($event)"
+  (updateData)="handleUpdate($event)">
 </app-add-task>

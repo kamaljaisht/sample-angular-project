@@ -16,6 +16,7 @@ export class AddTaskComponent {
   @Input() task: any;
   @Input() totalTasks: any;
   @Output() saved = new EventEmitter<Task>();
+  @Output() updateData = new EventEmitter<Task>();
   isEditMode: boolean = false;
   loading: boolean = false;
   taskForm: FormGroup;
@@ -39,8 +40,7 @@ export class AddTaskComponent {
     }
     else {
       this.isEditMode = false;
-      this.taskForm.reset();
-      this.taskForm.patchValue({ completed: false });
+      this.taskForm.reset({ completed: false });
     }
   }
 
@@ -51,14 +51,13 @@ export class AddTaskComponent {
     }
     this.loading = true;
     const payload = this.taskForm.value;
-    console.log(this.isEditMode)
     if (this.isEditMode) {
       if (this.task.id <= this.totalTasks) {
         this.dashService
           .updateTask(this.task.id, payload)
           .subscribe({
             next: (res) => {
-              this.saved.emit(res);
+              this.updateData.emit(res);
               this.showSuccessAndClose();
             },
             error: (err) => {
@@ -66,7 +65,7 @@ export class AddTaskComponent {
             }
           });
       } else {
-        this.saved.emit({ ...this.taskForm.value, id: this.task.id });
+        this.updateData.emit({ ...this.taskForm.value, id: this.task.id });
         this.showSuccessAndClose();
       }
     } else {
@@ -88,7 +87,7 @@ export class AddTaskComponent {
     this.toastService.showSuccess(`Task ${this.isEditMode ? 'updated' : 'added'} successfully`);
     this.loading = false;
     this.isEditMode = false;
-    this.taskForm.reset();
+    this.taskForm.reset({ completed: false });
     const modalElement = document.getElementById('taskModal');
     const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
     (document.activeElement as HTMLElement)?.blur();
