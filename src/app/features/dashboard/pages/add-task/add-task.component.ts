@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DashboardService } from '../../services/dashboard.service';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -14,6 +14,7 @@ import { Task } from '../../../../shared/models/task.model';
 })
 export class AddTaskComponent {
   @Input() task: any;
+  @Input() totalTasks: any;
   @Output() saved = new EventEmitter<Task>();
   isEditMode: boolean = false;
   loading: boolean = false;
@@ -31,10 +32,15 @@ export class AddTaskComponent {
     });
   }
 
-  ngOnChanges() {
-    if (this.task) {
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.hasOwnProperty("task") && changes["task"].currentValue) {
       this.isEditMode = true;
       this.taskForm.patchValue(this.task);
+    }
+    else {
+      this.isEditMode = false;
+      this.taskForm.reset();
+      this.taskForm.patchValue({ completed: false });
     }
   }
 
@@ -45,18 +51,24 @@ export class AddTaskComponent {
     }
     this.loading = true;
     const payload = this.taskForm.value;
+    console.log(this.isEditMode)
     if (this.isEditMode) {
-      this.dashService
-        .updateTask(this.task.id, payload)
-        .subscribe({
-          next: (res) => {
-            this.saved.emit(res);
-            this.showSuccessAndClose();
-          },
-          error: (err) => {
-            this.showError(err);
-          }
-        });
+      if (this.task.id <= this.totalTasks) {
+        this.dashService
+          .updateTask(this.task.id, payload)
+          .subscribe({
+            next: (res) => {
+              this.saved.emit(res);
+              this.showSuccessAndClose();
+            },
+            error: (err) => {
+              this.showError(err);
+            }
+          });
+      } else {
+        this.saved.emit({ ...this.taskForm.value, id: this.task.id });
+        this.showSuccessAndClose();
+      }
     } else {
       this.dashService
         .addTask(payload)
@@ -73,14 +85,14 @@ export class AddTaskComponent {
   }
 
   showSuccessAndClose() {
-    this.toastService.showSuccess('Task added successfully');
-    setTimeout(() => {
-      this.loading = false;
-      const modalElement = document.getElementById('taskModal');
-      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
-      (document.activeElement as HTMLElement)?.blur();
-      modal.hide();
-    }, 1000);
+    this.toastService.showSuccess(`Task ${this.isEditMode ? 'updated' : 'added'} successfully`);
+    this.loading = false;
+    this.isEditMode = false;
+    this.taskForm.reset();
+    const modalElement = document.getElementById('taskModal');
+    const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+    (document.activeElement as HTMLElement)?.blur();
+    modal.hide();
   }
 
   showError(err: any) {

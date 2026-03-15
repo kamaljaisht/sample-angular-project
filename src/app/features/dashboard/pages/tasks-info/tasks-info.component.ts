@@ -4,6 +4,7 @@ import { Task } from '../../../../shared/models/task.model';
 import { ColDef } from 'ag-grid-community';
 import { DataTableComponent } from '../../../../shared/components/data-table/data-table.component';
 import { AddTaskComponent } from '../add-task/add-task.component';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-tasks-info',
@@ -34,9 +35,11 @@ export class TasksInfoComponent {
     }
   ];
   selectedTask: any = null;
+  totalTasks: number = 0;
 
   constructor(
     private dashService: DashboardService,
+    private toastService: ToastService
   ) {
   }
 
@@ -47,6 +50,7 @@ export class TasksInfoComponent {
   loadTaskInfo = () => {
     this.dashService.getTaskInfo().subscribe(data => {
       this.taskInfo = data?.todos;
+      this.totalTasks = data?.total;
     })
   }
 
@@ -69,10 +73,24 @@ export class TasksInfoComponent {
 
   deleteTask = (data: Task) => {
     if (!confirm('Delete this task?')) return;
-    this.dashService.deleteTask(data.id)
-      .subscribe(() => {
-        this.taskInfo = this.taskInfo.filter(t => t.id !== data.id);
-      });
+    if (data.id <= this.totalTasks) {
+      this.dashService.deleteTask(data.id)
+        .subscribe({
+          next: (res) => {
+            this.toastService.showSuccess('Task deleted successfully');
+            this.taskInfo = this.taskInfo.filter(t => t.id !== data.id);
+          },
+          error: (err) => {
+            const message =
+              err?.error?.message || 'Something went wrong';
+            this.toastService.showError(message);
+          }
+        }
+        );
+    }
+    else {
+      this.taskInfo = this.taskInfo.filter(t => t.id !== data.id);
+    }
   }
 
   openAddTask = () => {
