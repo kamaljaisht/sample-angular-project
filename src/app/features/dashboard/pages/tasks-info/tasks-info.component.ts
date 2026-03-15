@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Task } from '../../../../shared/models/task.model';
 import { ColDef } from 'ag-grid-community';
@@ -15,27 +15,35 @@ import { ToastService } from '../../../../shared/services/toast.service';
 })
 export class TasksInfoComponent {
   taskInfo: Task[] = [];
-  columns: ColDef[] = [
-    { field: 'id', headerName: 'ID', width: 80 },
-    { field: 'todo', headerName: 'Task Title', flex: 2 },
-    {
-      field: 'completed',
-      headerName: 'Status',
-      valueFormatter: params => params.value ? `<span class="badge bg-success">Completed</span>`
-        : `<span class="badge bg-warning">Pending</span>`,
-      flex: 1
-    },
-    { field: 'userId', headerName: 'User ID', flex: 1 },
-    {
-      headerName: 'Actions',
-      cellRenderer: () => `
-    <button class="btn btn-sm btn-primary me-2 edit-btn">Edit</button>
-    <button class="btn btn-sm btn-danger delete-btn">Delete</button>
-  `
-    }
-  ];
+  columns: ColDef[] = [];
+  // columns: ColDef[] = [
+  //   { field: 'id', headerName: 'ID', width: 80 },
+  //   {
+  //     field: 'todo', headerName: 'Task Title',
+  //     flex: 2 
+  //   },
+  //   {
+  //     field: 'completed',
+  //     headerName: 'Status',
+  //     valueFormatter: params => params.value ? `<span class="badge bg-success">Completed</span>`
+  //       : `<span class="badge bg-warning">Pending</span>`,
+  //     flex: 1
+  //   },
+  //   {
+  //     field: 'userId', headerName: 'User ID',
+  //     flex: 1 
+  //   },
+  //   {
+  //     headerName: 'Actions',
+  //     cellRenderer: () => `
+  //   <button class="btn btn-sm btn-primary me-2 edit-btn">Edit</button>
+  //   <button class="btn btn-sm btn-danger delete-btn">Delete</button>
+  // `
+  //   }
+  // ];
   selectedTask: any = null;
   totalTasks: number = 0;
+  isLargeScreen: boolean = false;
 
   constructor(
     private dashService: DashboardService,
@@ -45,6 +53,41 @@ export class TasksInfoComponent {
 
   ngOnInit() {
     this.loadTaskInfo();
+    this.updateScreenWidth();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any): void {
+    this.updateScreenWidth();
+  }
+
+  updateScreenWidth(): void {
+    this.isLargeScreen = window.screen.width > 1100;
+    this.setColumnDefs();
+  }
+
+  setColumnDefs() {
+    this.columns = [
+      { field: 'id', headerName: 'ID', width: 120 },
+      {
+        field: 'todo', headerName: 'Task Title',
+        flex: this.isLargeScreen ? 2 : 0
+      },
+      {
+        field: 'completed',
+        headerName: 'Status',
+        valueFormatter: params => params.value ? `<span class="badge bg-success">Completed</span>`
+          : `<span class="badge bg-warning">Pending</span>`,
+      },
+      { field: 'userId', headerName: 'User ID' },
+      {
+        headerName: 'Actions',
+        cellRenderer: () => `
+    <button class="btn btn-sm btn-primary me-2 edit-btn">Edit</button>
+    <button class="btn btn-sm btn-danger delete-btn">Delete</button>
+  `
+      }
+    ];
   }
 
   loadTaskInfo = () => {
@@ -109,15 +152,15 @@ export class TasksInfoComponent {
     //   this.taskInfo[index] = data;
     //   this.taskInfo = [...this.taskInfo];
     // } else {
-      const exists = this.taskInfo.some(t => t.id === data.id);
-      if (exists) {
-        const maxId = Math.max(...this.taskInfo.map(t => t.id));
-        data.id = maxId + 1;
-      }
-      this.taskInfo = [
-        data,
-        ...this.taskInfo
-      ];
+    const exists = this.taskInfo.some(t => t.id === data.id);
+    if (exists) {
+      const maxId = Math.max(...this.taskInfo.map(t => t.id));
+      data.id = maxId + 1;
+    }
+    this.taskInfo = [
+      data,
+      ...this.taskInfo
+    ];
     // }
   }
 
